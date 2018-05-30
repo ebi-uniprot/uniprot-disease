@@ -46,7 +46,7 @@ to pull from docker hub and start container in backgroud
 ```
 docker run -d --name disease -p8080:8080 impo/disease_api:2018_05
 ```
-Need any help regarding git commands see [git](https://github.com/rizwan-ishtiaq/wiki/blob/master/commands/docker.txt) for quick reference.
+Need any help regarding docker commands see [docker](https://github.com/rizwan-ishtiaq/wiki/blob/master/commands/docker.txt) for quick reference.
 
 ## Code Explanation
 1. Package name convention, using the plural for packages with homogeneous contents and the singular for packages with heterogeneous contents.
