@@ -32,7 +32,7 @@ public class ParseReferenceCountLines {
             if (isValidRecord(record)) {
                 final String identifier = record.get(0).trim();
                 final int type = Integer.parseInt(record.get(1).trim());
-                final int count = Integer.valueOf(record.get(2).trim());
+                final int count = Integer.parseInt(record.get(2).trim());
 
                 tempMap.merge(identifier, getDiseaseRefCountObject(identifier, type, count), this::merge);
             } else {
@@ -73,7 +73,7 @@ public class ParseReferenceCountLines {
             return false;
         } else {
             try {
-                Integer.valueOf(record.get(2).trim());
+                Integer.parseInt(record.get(2).trim());
             } catch (NumberFormatException e) {
                 return false;
             }
