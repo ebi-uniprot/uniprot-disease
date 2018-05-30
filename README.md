@@ -10,9 +10,10 @@ Standalone application, you need java8 and maven to startup.
 * Maven 3.5.2
 * Junit 5.01
 * Mockito 2.18.3
-* jackson 2.9.5
-* assertj 3.9.1
-* docker 17.12
+* Jackson 2.9.5
+* Assertj 3.9.1
+* Docker 17.12
+* Apache commons-csv 1.5
 
 ## Endpoints
 Endpoint | Description

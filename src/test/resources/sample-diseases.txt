@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+        UniProt Knowledgebase
+        SIB Swiss Institute of Bioinformatics; Geneva, Switzerland
+        European Bioinformatics Institute (EBI); Hinxton, United Kingdom
+        Protein Information Resource (PIR); Washington DC, USA
+---------------------------------------------------------------------------
+
+Description: Controlled vocabulary of human diseases
+Name:        humdisease.txt
+Release:     2018_05 of 23-May-2018
+
+---------------------------------------------------------------------------
+
+  This document lists the controlled vocabulary that is used for the
+  annotation of human diseases in UniProtKB/Swiss-Prot.
+
+  It follows the format below:
+
+  ---------  ---------------------------     ------------------------------
+  Line code  Content                         Occurrence in an entry
+  ---------  ---------------------------     ------------------------------
+  ID         Identifier                      Once; starts an entry
+  AC         Accession (DI-xxxxx)            Once
+  AR         Acronym                         Once
+  DE         Definition                      Once or more
+  SY         Alternative name(s)             Optional; once or more
+  DR         Cross-reference(s)              Once or more
+  KW         Associated keyword (accession)  Optional; Once or more
+  //         Terminator                      Once; ends an entry
+
+  Sources: OMIM, Scientific articles, Dorland's Medical Dictionary,
+  Orphanet.
+
+___________________________________________________________________________
+ID   Wiskott-Aldrich syndrome.
+AC   DI-01147
+AR   WAS.
+DE   An X-linked recessive immunodeficiency characterized by eczema,
+DE   thrombocytopenia, recurrent infections, and bloody diarrhea. Death
+DE   usually occurs before age 10.
+SY   Aldrich syndrome.
+SY   Eczema-thrombocytopenia-immunodeficiency syndrome.
+SY   IMD2.
+SY   Immunodeficiency 2.
+SY   WAS1.
+SY   Wiskott-Aldrich syndrome 1.
+DR   MIM; 301000; phenotype.
+DR   MedGen; C0043194.
+DR   MeSH; D014923.
+//
+ID   Wiskott-Aldrich syndrome 2.
+AC   DI-03385
+AR   WAS2.
+DE   An immunodeficiency disorder characterized by eczema,
+DE   thrombocytopenia, recurrent infections, defective T-cell
+DE   proliferation, and impaired natural killer cell function.
+SY   WIPF1 deficiency.
+DR   MIM; 614493; phenotype.
+DR   MedGen; C3281001.
+DR   MeSH; D014923.
+//
+ID   Wolcott-Rallison syndrome.
+AC   DI-01149
+AR   WRS.
+DE   A rare autosomal recessive disorder, characterized by permanent
+DE   neonatal or early infancy insulin-dependent diabetes and, at a later
+DE   age, epiphyseal dysplasia, osteoporosis, growth retardation and other
+DE   multisystem manifestations, such as hepatic and renal dysfunctions,
+DE   mental retardation and cardiovascular abnormalities.
+SY   IDDM-MED syndrome.
+SY   MED-IDDM syndrome.
+SY   Multiple epiphyseal dysplasia with early-onset diabetes mellitus.
+DR   MIM; 226980; phenotype.
+DR   MedGen; C0432217.
+DR   MeSH; D010009.
+//
+ID   Wolff-Parkinson-White syndrome.
+AC   DI-01150
+AR   WPWS.
+DE   A supernormal conduction disorder characterized by the presence of one
+DE   or several accessory atrioventricular connections, which can lead to
+DE   episodes of sporadic tachycardia.
+SY   Ventricular familial preexcitation syndrome.
+DR   MIM; 194200; phenotype.
+DR   MedGen; C0032915.
+DR   MedGen; C0043202.
+DR   MeSH; D014927.
+//
+-----------------------------------------------------------------------
+Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
+Distributed under the Creative Commons Attribution-NoDerivs License
+-----------------------------------------------------------------------

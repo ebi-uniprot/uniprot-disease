@@ -1,0 +1,6 @@
+Wiskott-Aldrich syndrome 2,1,3
+Wiskott-Aldrich syndrome,0,1
+Wiskott-Aldrich syndrome 2,0,1
+Wolcott-Rallison syndrome,0,2
+Wolff-Parkinson-White syndrome,0,1
+Wolcott-Rallison syndrome,1,4
