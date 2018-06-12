@@ -34,10 +34,10 @@ Standalone application, you need java8 and maven to startup.
 Endpoint | Description
 -------- | -----------
 http://localhost:8080/accession/DI-04904 | Return the single disease exact match on accession=DI-04904 (case-sensitive)
-http://localhost:8080/acronym/ACHP | Return the single disease exact match on acronym=ACHP (case-sensitive)
-http://localhost:8080/identifier/Acatalasemia | Return single disease exact match on identifier=Acatalasemia (case-sensitive)
-http://localhost:8080/identifier/all/1A | Returns the collection of all the matching diseases which contains the "1A" after ignoring case in identifiers.
-http://localhost:8080/search/lyase 3KTD | Returns the unique collection of all the matching diseases which contains the "lyase" or "3KTD" after ignoring case in identifier or accession or acronym or synonyms (alternative names) or definition.
+http://localhost:8080/acronym/achp | Return the single disease exact match on acronym=ACHP (case-innsensitive)
+http://localhost:8080/identifier/acatalasemia | Return single disease exact match on identifier=Acatalasemia (case-insensitive)
+http://localhost:8080/identifier/all/1A | Returns the collection of all the matching diseases which have word "1A" after ignoring case in identifiers.
+http://localhost:8080/search/lyase 3KTD | Returns the unique collection of all the matching diseases which contains the words "lyase" or "3KTD" after ignoring case in identifier or accession or acronym or synonyms (alternative names) or definition.
 
 ## Getting started with Docker
 You can build image [locally](docker) as well as use docker hub to pull image.
