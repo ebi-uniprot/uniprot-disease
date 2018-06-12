@@ -3,6 +3,9 @@ package uk.ac.ebi.uniprot.uniprotdisease.repositories;
 import uk.ac.ebi.uniprot.uniprotdisease.domains.Disease;
 import uk.ac.ebi.uniprot.uniprotdisease.import_data.CombineDiseaseAndRefCount;
 
+import java.util.regex.Pattern;
+import org.assertj.core.util.Arrays;
+import org.bson.Document;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -55,7 +58,7 @@ class DiseaseRepositoryTest {
     @ParameterizedTest
     @ValueSource(strings = "WAS")
     void findByAcronym(final String acronym) {
-        final Disease retObj = repo.findByAcronym(acronym);
+        final Disease retObj = repo.findByAcronymIgnoreCase(acronym);
         assertObject(retObj);
     }
 
@@ -65,7 +68,7 @@ class DiseaseRepositoryTest {
     @ParameterizedTest
     @ValueSource(strings = "Wiskott-Aldrich syndrome")
     void findByIdentifier(final String identifier) {
-        final Disease retObj = repo.findByIdentifier(identifier);
+        final Disease retObj = repo.findByIdentifierIgnoreCase(identifier);
         assertObject(retObj);
     }
 
@@ -113,16 +116,18 @@ class DiseaseRepositoryTest {
 
     @ParameterizedTest
     @ValueSource(strings = "wiskott-aldrich syndrome")
-    void identifierCaseChangeWillNotWork(final String identifier) {
-        final Disease retObj = repo.findByIdentifier(identifier);
-        assertThat(retObj).isNull();
+    void identifierCaseChangeWillWork(final String identifier) {
+        final Disease retObj = repo.findByIdentifierIgnoreCase(identifier);
+        assertThat(retObj).isNotNull();
+        assertObject(retObj);
     }
 
     @ParameterizedTest
     @ValueSource(strings = "WaS")
-    void acronymCaseChangeWillNotWork(final String acronym) {
-        final Disease retObj = repo.findByAcronym(acronym);
-        assertThat(retObj).isNull();
+    void acronymCaseChangeWillWork(final String acronym) {
+        final Disease retObj = repo.findByAcronymIgnoreCase(acronym);
+        assertThat(retObj).isNotNull();
+        assertObject(retObj);
     }
 
     @ParameterizedTest
@@ -140,6 +145,64 @@ class DiseaseRepositoryTest {
                         input, input, input, input, input);
         assertNotNull(retCol);
         assertEquals(4, retCol.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"wiskott-aldrich", "aldrich", "wiskott"})
+    void findByidentifierWholeWordCaseInsensitive(final String id) {
+        final Pattern input = Pattern.compile("\\b"+id+"\\b", Pattern.CASE_INSENSITIVE);
+        final Collection<Disease> result = repo.findByIdentifierRegex(input);
+        assertThat(result).isNotNull().hasSize(2);
+        assertThat(result).extracting(ACCESSION_PROP).doesNotContain("DI-01149","DI-01150");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"wiskott-aldric", "iskott-aldrich", "tt-al"})
+    void findByidentifierWholeWord(final String id) {
+        final Pattern input = Pattern.compile("\\b"+id+"\\b", Pattern.CASE_INSENSITIVE);
+        final Collection<Disease> result = repo.findByIdentifierRegex(input);
+        assertThat(result).isNotNull().hasSize(0);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-"})
+    void dashWillConsiderCompleteWord(final String id) {
+        final Pattern input = Pattern.compile("\\b"+id+"\\b", Pattern.CASE_INSENSITIVE);
+        final Collection<Disease> result = repo.findByIdentifierRegex(input);
+        assertThat(result).isNotNull().hasSize(4);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = "immunodefiCiency")
+    void searchInIdentifierAccessionAcronymAlternativeNameDefinitionWholeWordIgnoreCase(final String id) {
+        final Pattern i = Pattern.compile(id, Pattern.CASE_INSENSITIVE);
+
+        final Collection<Disease> result = repo
+                .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(i,i,i,i,
+                        i);
+        assertThat(result).isNotNull().hasSize(2);
+    }
+
+    @Test
+    void passingDocumentDiaynamicQueryShouldFulfilCriteriaAndTest(){
+        final Document cri1 = new Document("accession", "DI-01150");
+        final Document cri2 = new Document("acronym","WPWS");
+        final Document query = new Document("$and", Arrays.array(cri1, cri2));
+
+        final Collection<Disease> result = repo.findByJsonDocumentQuery(query);
+        assertThat(result).isNotNull().hasSize(1);
+        assertThat(result).extracting(ACCESSION_PROP).contains("DI-01150");
+    }
+
+    @Test
+    void passingDocumentDiaynamicQueryShouldFulfilCriteriaOrTest(){
+        final Document cri1 = new Document("accession", "DI-01150");
+        final Document cri2 = new Document("acronym","WRS");
+        final Document query = new Document("$or", Arrays.array(cri1, cri2));
+
+        final Collection<Disease> result = repo.findByJsonDocumentQuery(query);
+        assertThat(result).isNotNull().hasSize(2);
+        assertThat(result).extracting(ACCESSION_PROP).contains("DI-01150","DI-01149");
     }
 
 }

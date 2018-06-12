@@ -6,10 +6,12 @@ import uk.ac.ebi.uniprot.uniprotdisease.repositories.DiseaseRepository;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -47,7 +49,7 @@ class DiseaseServiceTest {
 
     @Test
     void findByIdentifierShouldReturnSingleResultFromRepo() {
-        when(repo.findByIdentifier(anyString())).thenReturn(data.get(1));
+        when(repo.findByIdentifierIgnoreCase(anyString())).thenReturn(data.get(1));
 
         Disease found = diseaseService.findByIdentifier("CK syndrome");
         assertNotNull(found);
@@ -56,7 +58,7 @@ class DiseaseServiceTest {
 
     @Test
     void findByAcronymShouldReturnSingleResultFromRepo() {
-        when(repo.findByAcronym(anyString())).thenReturn(data.get(2));
+        when(repo.findByAcronymIgnoreCase(anyString())).thenReturn(data.get(2));
 
         Disease found = diseaseService.findByAcronym("CPI");
         assertNotNull(found);
@@ -65,7 +67,8 @@ class DiseaseServiceTest {
 
     @Test
     void findByIdentifierIgnoreCaseLikeShouldAddStarInParam() {
-        when(repo.findByIdentifierIgnoreCaseLike(eq("*i*"))).thenReturn(data);
+        Pattern p = Pattern.compile("\\bi\\b", Pattern.CASE_INSENSITIVE);
+        when(repo.findByIdentifierRegex(refEq(p))).thenReturn(data);
         Collection<Disease> retCol = diseaseService.findByIdentifierIgnoreCaseLike("i");
         assertNotNull(retCol);
         assertEquals(3, retCol.size());
@@ -79,32 +82,32 @@ class DiseaseServiceTest {
 
     @Test
     public void testKeywordSearch() {
-        String input = "*inner*";
+        Pattern input = Pattern.compile("\\binner\\b", Pattern.CASE_INSENSITIVE);
         doReturn(data.subList(0, 1)).when(repo)
-                .findByIdentifierIgnoreCaseLikeOrAccessionIgnoreCaseLikeOrAcronymIgnoreCaseLikeOrAlternativeNamesIgnoreCaseLikeOrDefinitionIgnoreCaseLike(
-                        eq(input), eq(input), eq(input), eq(input), eq(input));
+                .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(
+                        refEq(input), refEq(input), refEq(input), refEq(input), refEq(input));
 
-        input = "*man*";
+        input = Pattern.compile("\\bman\\b", Pattern.CASE_INSENSITIVE);
         doReturn(data.subList(1, 2)).when(repo)
-                .findByIdentifierIgnoreCaseLikeOrAccessionIgnoreCaseLikeOrAcronymIgnoreCaseLikeOrAlternativeNamesIgnoreCaseLikeOrDefinitionIgnoreCaseLike(
-                        eq(input), eq(input), eq(input), eq(input), eq(input));
+                .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(
+                        refEq(input), refEq(input), refEq(input), refEq(input), refEq(input));
 
-        input = "*outer*";
+        input = Pattern.compile("\\bouter\\b", Pattern.CASE_INSENSITIVE);
         doReturn(data.subList(2, 3)).when(repo)
-                .findByIdentifierIgnoreCaseLikeOrAccessionIgnoreCaseLikeOrAcronymIgnoreCaseLikeOrAlternativeNamesIgnoreCaseLikeOrDefinitionIgnoreCaseLike(
-                        eq(input), eq(input), eq(input), eq(input), eq(input));
+                .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(
+                        refEq(input), refEq(input), refEq(input), refEq(input), refEq(input));
 
-        input = "*not*";
+        input = Pattern.compile("\\bnot\\b", Pattern.CASE_INSENSITIVE);
         doReturn(data.subList(0, 1)).when(repo)
-                .findByIdentifierIgnoreCaseLikeOrAccessionIgnoreCaseLikeOrAcronymIgnoreCaseLikeOrAlternativeNamesIgnoreCaseLikeOrDefinitionIgnoreCaseLike(
-                        eq(input), eq(input), eq(input), eq(input), eq(input));
+                .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(
+                        refEq(input), refEq(input), refEq(input), refEq(input), refEq(input));
 
         Collection<Disease> retCol = diseaseService.findAllByKeyWordSearch("inNer Outer INNER man noT");
         assertNotNull(retCol);
         assertEquals(3, retCol.size());
 
         verify(repo, times(4))
-                .findByIdentifierIgnoreCaseLikeOrAccessionIgnoreCaseLikeOrAcronymIgnoreCaseLikeOrAlternativeNamesIgnoreCaseLikeOrDefinitionIgnoreCaseLike(
-                        anyString(), anyString(), anyString(), anyString(), anyString());
+                .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(
+                        any(Pattern.class), any(Pattern.class), any(Pattern.class), any(Pattern.class), any(Pattern.class));
     }
 }

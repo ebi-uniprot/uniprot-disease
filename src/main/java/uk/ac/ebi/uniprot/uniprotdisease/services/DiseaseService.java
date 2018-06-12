@@ -4,15 +4,16 @@ import uk.ac.ebi.uniprot.uniprotdisease.domains.Disease;
 import uk.ac.ebi.uniprot.uniprotdisease.import_data.CombineDiseaseAndRefCount;
 import uk.ac.ebi.uniprot.uniprotdisease.repositories.DiseaseRepository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static java.util.regex.Pattern.*;
 
 @Service
 public class DiseaseService {
@@ -41,29 +42,36 @@ public class DiseaseService {
 
     @Transactional(readOnly = true)
     public Disease findByIdentifier(final String identifier) {
-        return diseaseRepository.findByIdentifier(identifier);
+        return diseaseRepository.findByIdentifierIgnoreCase(identifier);
     }
 
     @Transactional(readOnly = true)
     public Disease findByAcronym(final String acronym) {
-        return diseaseRepository.findByAcronym(acronym);
+        return diseaseRepository.findByAcronymIgnoreCase(acronym);
     }
 
     @Transactional(readOnly = true)
     public Collection<Disease> findByIdentifierIgnoreCaseLike(final String identifier) {
-        return diseaseRepository.findByIdentifierIgnoreCaseLike("*" + identifier + "*");
+        final Pattern input = compile("\\b" + identifier + "\\b", CASE_INSENSITIVE);
+        return diseaseRepository.findByIdentifierRegex(input);
     }
 
     @Transactional(readOnly = true)
     public Collection<Disease> findAllByKeyWordSearch(final String input) {
-        Set<String> words =
-                Stream.of(input.split("\\s+")).map(s -> "*" + s.toLowerCase() + "*").collect(Collectors.toSet());
+        //Java don't override equals for Patthern
+        Comparator<Pattern> comp = (p1, p2) -> p1.pattern().compareTo(p2.pattern()) + (p1.flags()-p2.flags());
+
+        //Make only unique quries
+        Set<Pattern> words =
+                Stream.of(input.split("\\s+")).map(String::toLowerCase).map(s -> compile("\\b" + s + "\\b", CASE_INSENSITIVE))
+                        .collect(Collectors.toCollection(()->new TreeSet<>(comp)));
+
         // Database will be embedded so we can query multiple times with minimum performance hit
         // We could build dynamic query to save DB hits, but that will increase code also load on DB to scan for huge
         // set
         return words.stream()
                 .flatMap(i -> diseaseRepository
-                        .findByIdentifierIgnoreCaseLikeOrAccessionIgnoreCaseLikeOrAcronymIgnoreCaseLikeOrAlternativeNamesIgnoreCaseLikeOrDefinitionIgnoreCaseLike(
+                        .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(
                                 i, i, i, i, i).stream()).collect(Collectors.toSet());
     }
 }

@@ -30,6 +30,8 @@
         <!-- Integration test report path -->
         <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
         <jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</jacoco.itReportPath>
+        <!-- Below only needed to fix spring bug DATAMONGO-2003 This will remove in future -->
+        <mongodb.version>3.8.0-beta2</mongodb.version>
     </properties>
 
     <parent>
@@ -48,6 +50,20 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
+        <!-- Below only needed to fix spring bug DATAMONGO-2003 This will remove in future -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+            <version>2.1.0.BUILD-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Below only needed to fix spring bug DATAMONGO-2003 This will remove in future -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>2.1.0.BUILD-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -89,6 +105,13 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>io.spring</id>
+            <url>https://repo.spring.io/snapshot//</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
