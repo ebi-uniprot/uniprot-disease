@@ -16,6 +16,8 @@ Standalone application, you need java8 and maven to startup.
 * Assertj 3.9.1
 * Docker 17.12
 * Apache commons-csv 1.5
+* Swagger 2
+* Springfox
 
 ## Getting started
 1. Download diseases data file from ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/docs/humdisease.txt on local file system
@@ -38,6 +40,8 @@ http://localhost:8080/acronym/achp | Return the single disease exact match on ac
 http://localhost:8080/identifier/acatalasemia | Return single disease exact match on identifier=Acatalasemia (case-insensitive)
 http://localhost:8080/identifier/all/1A | Returns the collection of all the matching diseases which have word "1A" after ignoring case in identifiers.
 http://localhost:8080/search/lyase 3KTD | Returns the unique collection of all the matching diseases which contains the words "lyase" or "3KTD" after ignoring case in identifier or accession or acronym or synonyms (alternative names) or definition.
+http://localhost:8080/v2/api-docs | API documentation in JSON format
+http://localhost:8080/swagger-ui.html | API documentation for user (Web-UI)
 
 ## Getting started with Docker
 You can build image [locally](docker) as well as use docker hub to pull image.
