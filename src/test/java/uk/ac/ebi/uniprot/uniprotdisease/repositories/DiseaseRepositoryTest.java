@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uniprotdisease.repositories;
 
 import uk.ac.ebi.uniprot.uniprotdisease.domains.Disease;
+import uk.ac.ebi.uniprot.uniprotdisease.dto.DiseaseAutoComplete;
 import uk.ac.ebi.uniprot.uniprotdisease.import_data.CombineDiseaseAndRefCount;
 
 import java.util.regex.Pattern;
@@ -14,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collection;
@@ -107,7 +109,7 @@ class DiseaseRepositoryTest {
 
 
     @ParameterizedTest
-    @ValueSource(strings = "*TT*")
+    @ValueSource(strings = "TT")
     void identifierIgnoringCase(final String id) {
         final Collection<Disease> result = repo.findByIdentifierIgnoreCaseLike(id);
         assertThat(result).isNotNull().hasSize(3);
@@ -203,6 +205,19 @@ class DiseaseRepositoryTest {
         final Collection<Disease> result = repo.findByJsonDocumentQuery(query);
         assertThat(result).isNotNull().hasSize(2);
         assertThat(result).extracting(ACCESSION_PROP).contains("DI-01150","DI-01149");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = "n")
+    void autoCompleteAndPaginationChecks(final String id) {
+        List<DiseaseAutoComplete> result = repo.findProjectedByIdentifierIgnoreCaseLike(id, PageRequest.of(0, 1));
+        assertThat(result).isNotNull().hasSize(1);
+
+        result = repo.findProjectedByIdentifierIgnoreCaseLike(id, PageRequest.of(0, 10));
+        assertThat(result).isNotNull().hasSize(4);
+
+        assertThat(result).extracting(IDENTIFIER_PROP).contains("Wolff-Parkinson-White syndrome", "Wolcott-Rallison " +
+                "syndrome", "Wiskott-Aldrich syndrome 2", "Wiskott-Aldrich syndrome");
     }
 
 }

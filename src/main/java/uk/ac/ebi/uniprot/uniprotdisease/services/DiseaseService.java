@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uniprotdisease.services;
 
 import uk.ac.ebi.uniprot.uniprotdisease.domains.Disease;
+import uk.ac.ebi.uniprot.uniprotdisease.dto.DiseaseAutoComplete;
 import uk.ac.ebi.uniprot.uniprotdisease.import_data.CombineDiseaseAndRefCount;
 import uk.ac.ebi.uniprot.uniprotdisease.repositories.DiseaseRepository;
 
@@ -10,6 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,12 +62,13 @@ public class DiseaseService {
     @Transactional(readOnly = true)
     public Collection<Disease> findAllByKeyWordSearch(final String input) {
         //Java don't override equals for Patthern
-        Comparator<Pattern> comp = (p1, p2) -> p1.pattern().compareTo(p2.pattern()) + (p1.flags()-p2.flags());
+        Comparator<Pattern> comp = (p1, p2) -> p1.pattern().compareTo(p2.pattern()) + (p1.flags() - p2.flags());
 
         //Make only unique quries
         Set<Pattern> words =
-                Stream.of(input.split("\\s+")).map(String::toLowerCase).map(s -> compile("\\b" + s + "\\b", CASE_INSENSITIVE))
-                        .collect(Collectors.toCollection(()->new TreeSet<>(comp)));
+                Stream.of(input.split("\\s+")).map(String::toLowerCase)
+                        .map(s -> compile("\\b" + s + "\\b", CASE_INSENSITIVE))
+                        .collect(Collectors.toCollection(() -> new TreeSet<>(comp)));
 
         // Database will be embedded so we can query multiple times with minimum performance hit
         // We could build dynamic query to save DB hits, but that will increase code also load on DB to scan for huge
@@ -73,5 +77,12 @@ public class DiseaseService {
                 .flatMap(i -> diseaseRepository
                         .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(
                                 i, i, i, i, i).stream()).collect(Collectors.toSet());
+    }
+
+    @Transactional(readOnly = true)
+    public List<DiseaseAutoComplete> autoCompleteSearch(String search, Integer i) {
+        final int limited = i==null || i==0 ? 10 : i < 0 ? Integer.MAX_VALUE : i;
+        final Pageable pageable = PageRequest.of(0, limited);
+        return diseaseRepository.findProjectedByIdentifierIgnoreCaseLike(search, pageable);
     }
 }

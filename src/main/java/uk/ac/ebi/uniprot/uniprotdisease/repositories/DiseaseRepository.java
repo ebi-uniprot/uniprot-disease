@@ -1,10 +1,13 @@
 package uk.ac.ebi.uniprot.uniprotdisease.repositories;
 
 import uk.ac.ebi.uniprot.uniprotdisease.domains.Disease;
+import uk.ac.ebi.uniprot.uniprotdisease.dto.DiseaseAutoComplete;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.bson.Document;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -32,4 +35,6 @@ public interface DiseaseRepository extends MongoRepository<Disease, String> {
 
     @Query("?0")
     Collection<Disease> findByJsonDocumentQuery(Document query);
+
+    List<DiseaseAutoComplete> findProjectedByIdentifierIgnoreCaseLike(String identifier, Pageable page);
 }

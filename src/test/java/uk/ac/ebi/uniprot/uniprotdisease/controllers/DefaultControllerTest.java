@@ -1,11 +1,13 @@
 package uk.ac.ebi.uniprot.uniprotdisease.controllers;
 
 import uk.ac.ebi.uniprot.uniprotdisease.domains.Disease;
+import uk.ac.ebi.uniprot.uniprotdisease.dto.DiseaseAutoComplete;
 import uk.ac.ebi.uniprot.uniprotdisease.services.DiseaseService;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +55,7 @@ class DefaultControllerTest {
 
         given(diseaseService.findAllByKeyWordSearch("any string OR any"))
                 .willReturn(Arrays.asList(l, o, t));
+
     }
 
     @Test
@@ -118,5 +121,41 @@ class DefaultControllerTest {
                 mapper.getTypeFactory().constructCollectionType(List.class, Disease.class));
 
         assertThat(retList.size()).isEqualTo(3);
+    }
+
+    @Test
+    public void likeEndPointForAutoCompleteWithOutSize() throws Exception {
+        given(diseaseService.autoCompleteSearch("abc def", null)).willReturn(Collections.emptyList());
+
+        MvcResult rawRes = mockMvc.perform(get("/like/{wordCanBeSeperatedBySpace}", "abc def"))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    public void likeEndPointForAutoCompleteWithSize() throws Exception {
+
+        given(diseaseService.autoCompleteSearch("abc", 5)).willReturn(Arrays.asList(
+                new DiseaseAutoComplete() {
+                    @Override public String getIdentifier() {
+                        return "syndrome";
+                    }
+
+                    @Override public String getAccession() {
+                        return "D-123";
+                    }
+
+                    @Override public String getAcronym() {
+                        return "SDN";
+                    }
+                }
+        ));
+
+        MvcResult rawRes = mockMvc.perform(get("/like/abc?size=5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].identifier").value("syndrome"))
+                .andExpect(jsonPath("$[0].accession").value("D-123"))
+                .andExpect(jsonPath("$[0].acronym").value("SDN"))
+                .andReturn();
     }
 }

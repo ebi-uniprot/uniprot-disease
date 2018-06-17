@@ -1,10 +1,12 @@
 package uk.ac.ebi.uniprot.uniprotdisease.services;
 
 import uk.ac.ebi.uniprot.uniprotdisease.domains.Disease;
+import uk.ac.ebi.uniprot.uniprotdisease.dto.DiseaseAutoComplete;
 import uk.ac.ebi.uniprot.uniprotdisease.repositories.DiseaseRepository;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalAnswers.*;
@@ -81,7 +84,7 @@ class DiseaseServiceTest {
     }
 
     @Test
-    public void testKeywordSearch() {
+    void testKeywordSearch() {
         Pattern input = Pattern.compile("\\binner\\b", Pattern.CASE_INSENSITIVE);
         doReturn(data.subList(0, 1)).when(repo)
                 .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(
@@ -109,5 +112,33 @@ class DiseaseServiceTest {
         verify(repo, times(4))
                 .findByIdentifierRegexOrAccessionRegexOrAcronymRegexOrAlternativeNamesRegexOrDefinitionRegex(
                         any(Pattern.class), any(Pattern.class), any(Pattern.class), any(Pattern.class), any(Pattern.class));
+    }
+
+    @Test
+    void autoCompleteShouldCallPaginationWithDefault10WhenPassingSizeNull(){
+        when(repo.findProjectedByIdentifierIgnoreCaseLike(anyString(), refEq(PageRequest.of(0,10)))).thenReturn
+                (Collections.emptyList());
+        final List<DiseaseAutoComplete> retList = diseaseService.autoCompleteSearch("s", null);
+    }
+
+    @Test
+    void autoCompleteShouldCallPaginationWithDefault10WhenPassingSize0(){
+        when(repo.findProjectedByIdentifierIgnoreCaseLike(anyString(), refEq(PageRequest.of(0,10)))).thenReturn
+                (Collections.emptyList());
+        final List<DiseaseAutoComplete> retList = diseaseService.autoCompleteSearch("s", 0);
+    }
+
+    @Test
+    void autoCompleteShouldCallPaginationWithIntegerMaxWhenPassingSizeMinusValue(){
+        when(repo.findProjectedByIdentifierIgnoreCaseLike(anyString(), refEq(PageRequest.of(0,Integer.MAX_VALUE)))).thenReturn
+                (Collections.emptyList());
+        final List<DiseaseAutoComplete> retList = diseaseService.autoCompleteSearch("s", -1);
+    }
+
+    @Test
+    void autoCompleteWhenPassingPositiveValue(){
+        when(repo.findProjectedByIdentifierIgnoreCaseLike(eq("s"), refEq(PageRequest.of(0,5)))).thenReturn
+                (Collections.emptyList());
+        final List<DiseaseAutoComplete> retList = diseaseService.autoCompleteSearch("s", 5);
     }
 }

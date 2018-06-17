@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uniprotdisease.controllers;
 
 import uk.ac.ebi.uniprot.uniprotdisease.domains.Disease;
+import uk.ac.ebi.uniprot.uniprotdisease.dto.DiseaseAutoComplete;
 import uk.ac.ebi.uniprot.uniprotdisease.services.DiseaseService;
 
 import java.util.Collection;
@@ -40,5 +41,10 @@ public class DefaultController {
     @GetMapping("search/{wordSeperatedBySpace}")
     public Collection<Disease> search(@PathVariable String wordSeperatedBySpace) {
         return diseaseService.findAllByKeyWordSearch(wordSeperatedBySpace);
+    }
+
+    @GetMapping("like/{wordCanBeSeperatedBySpace}")
+    public Collection<DiseaseAutoComplete> autoComplete(@PathVariable String wordCanBeSeperatedBySpace, Integer size) {
+        return diseaseService.autoCompleteSearch(wordCanBeSeperatedBySpace, size);
     }
 }
